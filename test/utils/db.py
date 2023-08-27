@@ -1,6 +1,10 @@
+import os
+from typing import Any, Sequence
+
 import asyncpg
 
 from common import exception_handler
+from test import ROOT_PATH
 
 
 # TODO: exception_handler looks excessive
@@ -58,3 +62,14 @@ async def create_db_if_not_exists(
         db_name,
         db_owner,
     )
+
+
+async def execute_sql_script(
+    connection: asyncpg.Connection,
+    script_path: str,
+    args: Sequence[Any] | None = None,
+) -> None:
+    """Execute SQL script located by given path."""
+    with open(os.path.join(ROOT_PATH, script_path), 'r', encoding='utf-8') as f:
+        data = f.read()
+    await connection.execute(data, *(args or ()))
