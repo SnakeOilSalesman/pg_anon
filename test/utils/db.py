@@ -21,6 +21,7 @@ async def drop_and_recreate_db(connection: asyncpg.Connection, db_name: str, db_
         db_name,
     )
 
+    # TODO: do it the pytest way - drop clean-up all entities after test run
     print(f"""DROP DATABASE IF EXISTS {db_name} and CREATE DATABASE""")
     await connection.execute(f"""DROP DATABASE IF EXISTS {db_name}""")
     await connection.execute(
@@ -47,6 +48,7 @@ async def create_db_if_not_exists(
     db_exists = await connection.fetch(
         """SELECT datname from pg_database WHERE datname = %1""", db_name
     )
+    # TODO: according to pytest approach, there should be no existing DB. Improve this.
     if len(db_exists) != 0:
         return
 

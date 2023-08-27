@@ -106,3 +106,35 @@ def stress_env_init_script() -> str:
         )
 
     return script_text
+
+
+@pytest_asyncio.fixture
+async def set_test_env(
+    create_dbs: None,
+    source_db: asyncpg.Connection,
+    regular_env_init_script: str,
+    common_values: CommonValues,
+) -> None:
+    """Create regular test environment, create relations and insert test values."""
+    await source_db.execute(
+        regular_env_init_script.replace(
+            SCALE_PLACEHOLDER, str(SCALE_DEFAULT_VALUE * common_values.SCALE)
+        )
+    )
+    # TODO: should we drop everything created by "init_env" script? Or owned by test user?
+
+
+@pytest_asyncio.fixture
+async def set_stress_env(
+    create_dbs: None,
+    source_db: asyncpg.Connection,
+    stress_env_init_script: str,
+    common_values: CommonValues,
+) -> None:
+    """Create stress test environment, create relations and insert test values."""
+    await source_db.execute(
+        stress_env_init_script.replace(
+            str(SCALE_DEFAULT_VALUE), str(SCALE_DEFAULT_VALUE * common_values.SCALE)
+        )
+    )
+    # TODO: should we drop everything created by "init_env" script? Or owned by test user?
