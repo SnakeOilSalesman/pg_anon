@@ -6,6 +6,7 @@ import pytest_asyncio
 
 from test import SQL_SCRIPTS_PATH
 from test.entities import CommonValues, DatabaseCredentials
+from test.utils.db import drop_and_recreate_db
 
 SCALE_PLACEHOLDER: str = ':SCALE'
 SCALE_DEFAULT_VALUE: int = 1512
@@ -55,6 +56,22 @@ async def source_db(
     )
     yield connection
     connection.close()
+
+
+@pytest_asyncio.fixture
+def create_dbs(initial_db: asyncpg.Connection, common_values: CommonValues) -> None:
+    """Create test databases intended for regular testing."""
+    db_names = (
+        common_values.SOURCE_DB,
+        common_values.TARGET_DB,
+        *[f'{common_values.TARGET_DB}_{n}' for n in range(2, 7)],
+    )
+    for name in db_names:
+        drop_and_recreate_db(initial_db, name, common_values.DB_OWNER)
+
+    yield
+
+    # TODO: should we drop those tables here?
 
 
 @pytest.fixture
