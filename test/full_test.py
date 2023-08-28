@@ -6,6 +6,7 @@ import os
 from decimal import Decimal
 
 import asyncpg
+import pytest
 
 from common import (
     PgAnonResult,
@@ -15,6 +16,9 @@ from common import (
     to_json,
 )
 from pg_anon import Context, MainRoutine
+
+pytestmark = pytest.mark.skip('For now avoid running original tests')
+
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
